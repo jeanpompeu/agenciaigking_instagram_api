@@ -22,6 +22,10 @@ const connect = async () => {
 
 connect()
 
+app.get('/', (req, res) => {
+    res.send('Hello World!')
+})
+
 app.post('/instagram', async (req, res) => {
     const username = req.body.username
 
