@@ -22,10 +22,6 @@ const connect = async () => {
 
 connect()
 
-app.get('/', (req, res) => {
-    res.send('Hello World!')
-})
-
 app.post('/instagram', async (req, res) => {
     const username = req.body.username
 
@@ -36,16 +32,18 @@ app.post('/instagram', async (req, res) => {
         var profile_pic = await user.getHdProfilePicture()
         const followers = await user.getFollowersCount()
         const following = await user.getFollowingCount()
-    
+        const isVerified = await user.isVerified()
+        const isPrivate = await user.isPrivate()
+
         profile_pic = await imageToBase64(profile_pic).then(r=> r)
     
-        return res.json({ ok: true, name, profile_pic, followers, following })
+        return res.json({ ok: true, isVerified, isPrivate, name, profile_pic, followers, following })
     } catch (error) {
         return res.json({ ok: false, message: 'Usuário não encontrado!' })
     }
 
 })
 
-app.listen(process.env.PORT || 3000, () => {
+app.listen(3000, () => {
     console.log('Server is running on port 3000')
 })
