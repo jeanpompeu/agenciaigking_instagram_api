@@ -26,7 +26,7 @@ app.post('/instagram', async (req, res) => {
     const username = req.body.username
 
     try {
-        const user = await instagram.getUserData(username)
+        const user = await instagram.getUserData(`${username}`)
     
         const name = await user.getFullName()
         var profile_pic = await user.getHdProfilePicture()
