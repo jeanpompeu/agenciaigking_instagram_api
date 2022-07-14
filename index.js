@@ -39,7 +39,7 @@ app.post('/instagram', async (req, res) => {
     
         return res.json({ ok: true, isVerified, isPrivate, name, profile_pic, followers, following })
     } catch (error) {
-        return res.json({ ok: false, message: 'Usuário não encontrado!' })
+        return res.json({ ok: false, message: 'Usuário não encontrado!', error: error.message })
     }
 
 })
