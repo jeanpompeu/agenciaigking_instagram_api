@@ -45,7 +45,8 @@ app.get("/instagram", async (request, response) => {
         }})
         
     } catch (error) {
-        return response.status(400).json({ ok: false})
+        console.log(error)
+        return response.status(400).json({ ok: false, error})
     }
 
 });
