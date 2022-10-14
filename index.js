@@ -14,8 +14,6 @@ const client = new lib();
     await client.init({
         cookie: process.env.COOKIES,
     });
-    const data = await client.getUsernameInfo('nay_louback')
-
 
 })();
 
