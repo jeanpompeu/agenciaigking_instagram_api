@@ -1,49 +1,59 @@
-require('dotenv').config()
-const express = require('express')
-const cors = require('cors')
-const app = express()
-const imageToBase64 = require('image-to-base64');
+require('dotenv').config();
+const express = require("express");
+const app = express();
+const fetch = require("cross-fetch");
+const cors = require("cors");
+const lib = require("instagram-apis");
+const imageToBase64 = require('image-to-base64')
 
 
+app.use(cors());
 
-app.use(express.json())
-app.use(cors())
+const client = new lib();
+(async () => {
+    await client.init({
+        cookie: process.env.COOKIES,
+    });
+    const data = await client.getUsernameInfo('nay_louback')
 
-const instagram = require('user-instagram')
 
-const connect = async () => {
-  try{
-    await instagram.authenticate(process.env.USERNAME, process.env.PASSWORD);
-    
-  }catch(err) {
-    console.log(err)
-  }
-}
+})();
 
-connect()
+app.get("/instagram", async (request, response) => {
+    const { username } = request.query;
 
-app.post('/instagram', async (req, res) => {
-    const username = req.body.username
-
-    try {
-        const user = await instagram.getUserData(`${username}`)
-    
-        const name = await user.getFullName()
-        var profile_pic = await user.getHdProfilePicture()
-        const followers = await user.getFollowersCount()
-        const following = await user.getFollowingCount()
-        const isVerified = await user.isVerified()
-        const isPrivate = await user.isPrivate()
-
-        profile_pic = await imageToBase64(profile_pic).then(r=> r)
-    
-        return res.json({ ok: true, isVerified, isPrivate, name, profile_pic, followers, following })
-    } catch (error) {
-        return res.json({ ok: false, message: 'Usuário não encontrado!', error: error.message })
+    if (!username || username.trim() == "") {
+        return response.status(400).json({ ok: false });
     }
 
-})
+    try {
+        const data = await client.getUsernameInfo(username)
+        var profile_pic = data.profile_pic_url_hd
+    
+        profile_pic = await imageToBase64(profile_pic)
+        var edge_followed_by = data.edge_followed_by
+        var edge_follow = data.edge_follow
+        var full_name = full_name
+        var is_private = data.is_private
+        var is_verified = data.is_verified
+    
+        return response.status(200).json({ ok: true, data: {
+            full_name,
+            profile_pic,
+            edge_follow,
+            edge_followed_by,
+            is_verified,
+            is_private
+        }})
+        
+    } catch (error) {
+        return response.status(400).json({ ok: false})
+    }
 
-app.listen(process.env.PORT || 3000, () => {
-    console.log('Server is running on port 3000')
-})
+});
+
+
+// listen for requests :)
+const listener = app.listen(process.env.PORT || 3000, () => {
+    console.log("Your app is listening on port " + listener.address().port);
+});
